@@ -6,6 +6,15 @@
   let token = match ? match[1] : null;
 
   const meta = await (await fetch('/api/meta')).json();
+  $('version').textContent = `v${meta.version}`;
+  for (const [key, id] of [['github', 'linkGithub'], ['discord', 'linkDiscord']]) {
+    const url = meta.links?.[key];
+    if (url && /^https:\/\//.test(url)) {
+      $(id).href = url;
+      $(id).hidden = false;
+    }
+  }
+
   // The notice can be dismissed; it comes back when its text changes.
   if (meta.notice) {
     const key = `notice-dismissed:${hash(meta.notice)}`;

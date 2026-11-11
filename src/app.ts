@@ -33,6 +33,8 @@ export interface AppDeps {
   signupCode: string;
   /** Plain-text notice for the configure page. */
   notice?: string;
+  /** Optional header links on the configure page. */
+  links?: { github?: string; discord?: string };
   store: ConfigStore;
   providers: Provider[];
   log?: (message: string, fields?: Record<string, unknown>) => void;
@@ -130,6 +132,7 @@ export function createApp(deps: AppDeps) {
     c.json({
       version: VERSION,
       notice: deps.notice?.trim() || null,
+      links: { github: deps.links?.github ?? null, discord: deps.links?.discord ?? null },
       languages: LANGUAGES.map(({ code, name }) => ({ code, name })),
       providers: [...providers.values()].map(({ id, name, signupUrl, credentialFields }) => ({
         id,

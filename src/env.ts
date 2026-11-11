@@ -18,6 +18,9 @@ const EnvSchema = z.object({
   NOTICE: z.string().max(2000).optional(),
   // Delete configs nobody has used for this many days. 0 keeps them forever.
   CONFIG_RETENTION_DAYS: z.coerce.number().int().min(0).default(365),
+  // Optional links shown as icons in the configure page header.
+  GITHUB_URL: z.string().url().optional(),
+  DISCORD_URL: z.string().url().optional(),
   PORT: z.coerce.number().int().positive().default(7000),
   DATA_DIR: z.string().default('/data'),
 });

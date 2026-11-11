@@ -18,6 +18,7 @@ const app = createApp({
   baseUrl: env.BASE_URL,
   signupCode: env.SIGNUP_CODE,
   notice: env.NOTICE,
+  links: { github: env.GITHUB_URL, discord: env.DISCORD_URL },
   store,
   log,
   providers: [

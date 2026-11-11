@@ -47,6 +47,7 @@ SubDL, SubSource and others can be added later.
 | `OPENSUBTITLES_API_KEY` | yes | Consumer key from <https://www.opensubtitles.com/consumers> |
 | `NOTICE` | no | Plain-text notice at the top of the configure page (blank lines split paragraphs), e.g. an availability disclaimer |
 | `CONFIG_RETENTION_DAYS` | no | Delete configs unused for this many days (default `365`, `0` keeps them forever) |
+| `GITHUB_URL`, `DISCORD_URL` | no | Links shown as icons in the configure page header |
 | `PORT` | no | Default `7000` |
 | `DATA_DIR` | no | Default `/data` (SQLite database `subs.db`) |
 

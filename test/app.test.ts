@@ -174,6 +174,18 @@ describe('app', () => {
     expect(((await (await withNotice.request('/api/meta')).json()) as any).notice).toBe('Personal instance.');
   });
 
+  it('exposes optional header links', async () => {
+    expect(((await (await send('GET', '/api/meta')).json()) as any).links).toEqual({ github: null, discord: null });
+    const withLinks = createApp({
+      baseUrl: BASE, signupCode: 'letmein123', store, providers: [provider],
+      links: { github: 'https://github.com/example/repo', discord: 'https://discord.gg/example' },
+    });
+    expect(((await (await withLinks.request('/api/meta')).json()) as any).links).toEqual({
+      github: 'https://github.com/example/repo',
+      discord: 'https://discord.gg/example',
+    });
+  });
+
   it('serves the logo files', async () => {
     const png = await send('GET', '/logo.png');
     expect(png.status).toBe(200);
