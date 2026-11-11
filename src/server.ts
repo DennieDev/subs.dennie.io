@@ -17,6 +17,7 @@ const store = new ConfigStore(env.SECRET_KEY, env.DATA_DIR);
 const app = createApp({
   baseUrl: env.BASE_URL,
   signupCode: env.SIGNUP_CODE,
+  notice: env.NOTICE,
   store,
   log,
   providers: [

@@ -153,6 +153,12 @@ describe('app', () => {
     expect((await send('GET', '/not-a-token/manifest.json')).status).toBe(404);
   });
 
+  it('exposes the optional notice to the configure page', async () => {
+    expect(((await (await send('GET', '/api/meta')).json()) as any).notice).toBeNull();
+    const withNotice = createApp({ baseUrl: BASE, signupCode: 'letmein123', store, providers: [provider], notice: '  Personal instance.  ' });
+    expect(((await (await withNotice.request('/api/meta')).json()) as any).notice).toBe('Personal instance.');
+  });
+
   it('serves the configure page with a strict CSP', async () => {
     const res = await send('GET', '/configure');
     expect(res.status).toBe(200);

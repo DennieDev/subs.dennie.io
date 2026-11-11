@@ -79,4 +79,16 @@ button:disabled { opacity: 0.6; cursor: wait; }
 .provider h3 { margin: 0; font-size: 1rem; }
 .provider .fields[hidden] { display: none; }
 .error { color: var(--danger); font-weight: 600; }
+.notice {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.notice p { margin: 0; }
+.notice p + p { margin-top: 8px; }
 a { color: var(--accent); }

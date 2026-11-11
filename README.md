@@ -42,6 +42,7 @@ SubDL, SubSource and others can be added later.
 | `SECRET_KEY` | yes | 64 hex chars (`openssl rand -hex 32`). **Never change it**: stored configs become unreadable. |
 | `SIGNUP_CODE` | yes | Code users enter to create a config (min. 8 chars) |
 | `OPENSUBTITLES_API_KEY` | yes | Consumer key from <https://www.opensubtitles.com/consumers> |
+| `NOTICE` | no | Plain-text notice at the top of the configure page (blank lines split paragraphs), e.g. an availability disclaimer |
 | `PORT` | no | Default `7000` |
 | `DATA_DIR` | no | Default `/data` (SQLite database `subs.db`) |
 

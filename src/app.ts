@@ -25,6 +25,8 @@ const RESOLVE_TTL_MS = 2 * 60 * 60 * 1000;
 export interface AppDeps {
   baseUrl: string;
   signupCode: string;
+  /** Plain-text notice for the configure page. */
+  notice?: string;
   store: ConfigStore;
   providers: Provider[];
   log?: (message: string, fields?: Record<string, unknown>) => void;
@@ -110,6 +112,7 @@ export function createApp(deps: AppDeps) {
   app.get('/api/meta', (c) =>
     c.json({
       version: VERSION,
+      notice: deps.notice?.trim() || null,
       languages: LANGUAGES.map(({ code, name }) => ({ code, name })),
       providers: [...providers.values()].map(({ id, name, signupUrl, credentialFields }) => ({
         id,

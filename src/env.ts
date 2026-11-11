@@ -13,6 +13,9 @@ const EnvSchema = z.object({
   SIGNUP_CODE: z.string().min(8, 'SIGNUP_CODE must be at least 8 characters'),
   // Consumer key from https://www.opensubtitles.com/consumers
   OPENSUBTITLES_API_KEY: z.string().min(1),
+  // Optional notice shown at the top of the configure page (plain text; blank lines split
+  // paragraphs). Use it for things like an availability disclaimer.
+  NOTICE: z.string().max(2000).optional(),
   PORT: z.coerce.number().int().positive().default(7000),
   DATA_DIR: z.string().default('/data'),
 });

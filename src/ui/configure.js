@@ -6,6 +6,15 @@
   let token = match ? match[1] : null;
 
   const meta = await (await fetch('/api/meta')).json();
+  if (meta.notice) {
+    const box = $('notice');
+    box.replaceChildren(
+      ...meta.notice
+        .split(/\n\s*\n/)
+        .map((text) => Object.assign(document.createElement('p'), { textContent: text.trim() })),
+    );
+    box.hidden = false;
+  }
   const languageNames = new Map(meta.languages.map((l) => [l.code, l.name]));
   let languages = ['dut', 'eng'];
   let existing = null;
