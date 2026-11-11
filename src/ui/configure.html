@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Dennie Subs</title>
+  <link rel="stylesheet" href="/ui/configure.css">
+  <script src="/ui/configure.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Dennie Subs</h1>
+      <p class="lead">Subtitles from your own provider accounts, in the languages you choose. Works in Stremio and as a custom addon in AIOStreams.</p>
+    </header>
+
+    <form id="form" novalidate>
+      <section id="signup-section">
+        <h2>Access</h2>
+        <label for="signupCode">Signup code</label>
+        <input id="signupCode" name="signupCode" type="password" autocomplete="off" required>
+        <p class="hint">Ask the person who runs this instance.</p>
+      </section>
+
+      <section>
+        <h2>Languages</h2>
+        <p class="hint">Subtitles are listed in this order. The first language is your favourite.</p>
+        <ol id="languages" class="lang-list"></ol>
+        <div class="row">
+          <select id="languageAdd" aria-label="Add a language"></select>
+          <button type="button" id="languageAddBtn" class="secondary">Add</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Providers</h2>
+        <div id="providers"></div>
+      </section>
+
+      <section>
+        <h2>Options</h2>
+        <label for="hearingImpaired">Hearing-impaired subtitles</label>
+        <select id="hearingImpaired">
+          <option value="include">Include</option>
+          <option value="prefer">Prefer</option>
+          <option value="exclude">Exclude</option>
+        </select>
+
+        <label for="maxPerLanguage">Maximum subtitles per language</label>
+        <input id="maxPerLanguage" type="number" min="1" max="30" value="10">
+
+        <label class="check"><input id="includeMachineTranslated" type="checkbox"> Include machine/AI-translated subtitles</label>
+      </section>
+
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <div class="row actions">
+        <button type="submit" id="save">Save</button>
+        <button type="button" id="delete" class="danger" hidden>Delete config</button>
+      </div>
+    </form>
+
+    <section id="result" hidden>
+      <h2>Your addon</h2>
+      <p>Keep this URL private: it gives access to your subtitle accounts.</p>
+      <label for="manifestUrl">Addon URL</label>
+      <div class="row">
+        <input id="manifestUrl" readonly>
+        <button type="button" id="copy" class="secondary">Copy</button>
+      </div>
+      <div class="row">
+        <a id="install" class="button" href="#">Install in Stremio</a>
+      </div>
+      <p class="hint"><strong>AIOStreams:</strong> Addons → Marketplace → Custom → paste the addon URL.<br>
+        To change settings later, open <a id="editLink" href="#">this page</a> (bookmark it, it is also private).</p>
+    </section>
+  </main>
+</body>
+</html>
