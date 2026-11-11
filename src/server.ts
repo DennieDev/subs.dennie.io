@@ -38,6 +38,15 @@ root.use('*', async (c, next) => {
 });
 root.route('/', app);
 
+// Remove configs nobody has used within the retention period: at startup, then daily.
+function purgeUnused() {
+  if (env.CONFIG_RETENTION_DAYS === 0) return;
+  const deleted = store.deleteUnused(env.CONFIG_RETENTION_DAYS);
+  if (deleted > 0) log('deleted unused configs', { count: deleted, retentionDays: env.CONFIG_RETENTION_DAYS });
+}
+purgeUnused();
+setInterval(purgeUnused, 24 * 60 * 60 * 1000).unref();
+
 const server = serve({ fetch: root.fetch, port: env.PORT }, () => {
   log('listening', { port: env.PORT, version: VERSION, configs: store.count() });
 });

@@ -31,6 +31,9 @@ SubDL, SubSource and others can be added later.
   the stored one.
 - New configs require `SIGNUP_CODE`, so the shared OpenSubtitles API key is not open to everyone.
   Config writes are rate limited per IP (10 per 10 minutes).
+- Unused configs are deleted after `CONFIG_RETENTION_DAYS` (default 365). To know what is unused,
+  each config records only the **day** it was last used (no times, no request details), written
+  at most once a day. Using the addon or opening its configure page counts as use.
 - Logs contain only fixed messages and paths with the token replaced by `***`. Subtitle request
   details (filename, video hash and size) are left out, so logs are not a viewing history.
 
@@ -43,6 +46,7 @@ SubDL, SubSource and others can be added later.
 | `SIGNUP_CODE` | yes | Code users enter to create a config (min. 8 chars) |
 | `OPENSUBTITLES_API_KEY` | yes | Consumer key from <https://www.opensubtitles.com/consumers> |
 | `NOTICE` | no | Plain-text notice at the top of the configure page (blank lines split paragraphs), e.g. an availability disclaimer |
+| `CONFIG_RETENTION_DAYS` | no | Delete configs unused for this many days (default `365`, `0` keeps them forever) |
 | `PORT` | no | Default `7000` |
 | `DATA_DIR` | no | Default `/data` (SQLite database `subs.db`) |
 

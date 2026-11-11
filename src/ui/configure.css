@@ -89,6 +89,19 @@ button:disabled { opacity: 0.6; cursor: wait; }
   color: var(--muted);
   font-size: 0.95rem;
 }
+.notice { display: flex; gap: 12px; align-items: flex-start; }
+.notice[hidden] { display: none; }
+.notice > div { flex: 1; }
+.notice-close {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 0 4px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.notice-close:hover { color: var(--text); }
 .notice p { margin: 0; }
 .notice p + p { margin-top: 8px; }
 a { color: var(--accent); }

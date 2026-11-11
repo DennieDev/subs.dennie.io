@@ -260,6 +260,7 @@ export function createApp(deps: AppDeps) {
       config = undefined;
     }
     if (!config) throw new HttpError(404, 'Unknown config');
+    store.touch(token);
     return { token, config };
   }
 

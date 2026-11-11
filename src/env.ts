@@ -16,6 +16,8 @@ const EnvSchema = z.object({
   // Optional notice shown at the top of the configure page (plain text; blank lines split
   // paragraphs). Use it for things like an availability disclaimer.
   NOTICE: z.string().max(2000).optional(),
+  // Delete configs nobody has used for this many days. 0 keeps them forever.
+  CONFIG_RETENTION_DAYS: z.coerce.number().int().min(0).default(365),
   PORT: z.coerce.number().int().positive().default(7000),
   DATA_DIR: z.string().default('/data'),
 });

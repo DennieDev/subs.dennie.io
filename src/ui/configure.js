@@ -6,14 +6,32 @@
   let token = match ? match[1] : null;
 
   const meta = await (await fetch('/api/meta')).json();
+  // The notice can be dismissed; it comes back when its text changes.
   if (meta.notice) {
-    const box = $('notice');
-    box.replaceChildren(
-      ...meta.notice
-        .split(/\n\s*\n/)
-        .map((text) => Object.assign(document.createElement('p'), { textContent: text.trim() })),
-    );
-    box.hidden = false;
+    const key = `notice-dismissed:${hash(meta.notice)}`;
+    let dismissed = false;
+    try {
+      dismissed = localStorage.getItem(key) === '1';
+    } catch {}
+    if (!dismissed) {
+      $('noticeText').replaceChildren(
+        ...meta.notice
+          .split(/\n\s*\n/)
+          .map((text) => Object.assign(document.createElement('p'), { textContent: text.trim() })),
+      );
+      $('notice').hidden = false;
+      $('noticeClose').addEventListener('click', () => {
+        $('notice').hidden = true;
+        try {
+          localStorage.setItem(key, '1');
+        } catch {}
+      });
+    }
+  }
+  function hash(text) {
+    let h = 0;
+    for (let i = 0; i < text.length; i++) h = (Math.imul(31, h) + text.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36);
   }
   const languageNames = new Map(meta.languages.map((l) => [l.code, l.name]));
   let languages = ['dut', 'eng'];

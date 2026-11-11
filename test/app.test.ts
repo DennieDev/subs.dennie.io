@@ -146,6 +146,17 @@ describe('app', () => {
     expect(store.get(token)?.preferences.languages).toEqual(['eng']);
   });
 
+  it('counts addon requests as use', async () => {
+    let now = 5000 * 24 * 60 * 60 * 1000;
+    store = new ConfigStore('c'.repeat(64), ':memory:', () => now);
+    app = createApp({ baseUrl: BASE, signupCode: 'letmein123', store, providers: [provider], now: () => now });
+    const token = await create();
+    now += 300 * 24 * 60 * 60 * 1000;
+    await send('GET', `/${token}/subtitles/movie/tt0111161.json`);
+    now += 300 * 24 * 60 * 60 * 1000;
+    expect(store.deleteUnused(365)).toBe(0); // used 300 days ago, not 600
+  });
+
   it('deletes configs and 404s unknown tokens', async () => {
     const token = await create();
     expect((await send('DELETE', `/api/configs/${token}`)).status).toBe(204);
