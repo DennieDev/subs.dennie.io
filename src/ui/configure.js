@@ -7,6 +7,7 @@
 
   const meta = await (await fetch('/api/meta')).json();
   $('version').textContent = `v${meta.version}`;
+  if (!meta.signupRequired) $('signup-section').hidden = true;
   for (const [key, id] of [['github', 'linkGithub'], ['discord', 'linkDiscord']]) {
     const url = meta.links?.[key];
     if (url && /^https:\/\//.test(url)) {
@@ -166,7 +167,7 @@
       },
       providers,
     };
-    if (!token) body.signupCode = $('signupCode').value;
+    if (!token && meta.signupRequired) body.signupCode = $('signupCode').value;
 
     const save = $('save');
     save.disabled = true;

@@ -8,9 +8,9 @@ const EnvSchema = z.object({
     .transform((v) => v.replace(/\/+$/, '')),
   // 64 hex chars. Together with each user's token it encrypts stored credentials.
   SECRET_KEY: z.string().regex(/^[0-9a-fA-F]{64}$/, 'SECRET_KEY must be 64 hex characters'),
-  // Code new users must enter to create a config. Keeps the instance from being an open
-  // relay for the shared OpenSubtitles API key.
-  SIGNUP_CODE: z.string().min(8, 'SIGNUP_CODE must be at least 8 characters'),
+  // Optional code new users must enter to create a config. Without it anyone can create
+  // one (still rate limited per IP), using the instance's OpenSubtitles API key.
+  SIGNUP_CODE: z.string().min(8, 'SIGNUP_CODE must be at least 8 characters').optional(),
   // Consumer key from https://www.opensubtitles.com/consumers
   OPENSUBTITLES_API_KEY: z.string().min(1),
   // Optional notice shown at the top of the configure page (plain text; blank lines split

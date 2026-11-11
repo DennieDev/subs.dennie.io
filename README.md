@@ -29,8 +29,11 @@ SubDL, SubSource and others can be added later.
   A leaked database is useless without the tokens.
 - Passwords are never sent back to the browser. Leaving a password blank on the edit page keeps
   the stored one.
-- New configs require `SIGNUP_CODE`, so the shared OpenSubtitles API key is not open to everyone.
-  Config writes are rate limited per IP (10 per 10 minutes).
+- Optionally, new configs require `SIGNUP_CODE`, so the shared OpenSubtitles API key is not open to
+  everyone. Without it, signup is open.
+  Config writes are rate limited per IP (10 per 10 minutes), new configs to 30 per hour across all
+  clients (each one tests a login against the provider, so this blocks credential stuffing and
+  protects the API key), and searches to 120 per minute per config.
 - Unused configs are deleted after `CONFIG_RETENTION_DAYS` (default 365). To know what is unused,
   each config records only the **day** it was last used (no times, no request details), written
   at most once a day. Using the addon or opening its configure page counts as use.
@@ -43,7 +46,7 @@ SubDL, SubSource and others can be added later.
 | -------- | -------- | ------- |
 | `BASE_URL` | yes | Public origin, e.g. `https://subs.example.com` |
 | `SECRET_KEY` | yes | 64 hex chars (`openssl rand -hex 32`). **Never change it**: stored configs become unreadable. |
-| `SIGNUP_CODE` | yes | Code users enter to create a config (min. 8 chars) |
+| `SIGNUP_CODE` | no | Code users must enter to create a config (min. 8 chars). Unset: open signup |
 | `OPENSUBTITLES_API_KEY` | yes | Consumer key from <https://www.opensubtitles.com/consumers> |
 | `NOTICE` | no | Plain-text notice at the top of the configure page (blank lines split paragraphs), e.g. an availability disclaimer |
 | `CONFIG_RETENTION_DAYS` | no | Delete configs unused for this many days (default `365`, `0` keeps them forever) |

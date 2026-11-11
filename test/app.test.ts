@@ -68,6 +68,34 @@ describe('app', () => {
     return body.token;
   }
 
+  it('allows open signup when no code is configured', async () => {
+    const open = createApp({ baseUrl: BASE, store, providers: [provider] });
+    expect(((await (await open.request('/api/meta')).json()) as any).signupRequired).toBe(false);
+    const res = await open.request('/api/configs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preferences, providers: { fake: { credentials: { username: 'u', password: 'good' } } } }),
+    });
+    expect(res.status).toBe(201);
+    expect(((await (await send('GET', '/api/meta')).json()) as any).signupRequired).toBe(true);
+  });
+
+  it('caps new configs across all clients and searches per config', async () => {
+    const limited = createApp({
+      baseUrl: BASE, store, providers: [provider], limits: { signupsPerHour: 1, searchesPerMinute: 1 },
+    });
+    const body = JSON.stringify({ preferences, providers: { fake: { credentials: { username: 'u', password: 'good' } } } });
+    const post = (ip: string) =>
+      limited.request('/api/configs', { method: 'POST', headers: { 'Content-Type': 'application/json', 'cf-connecting-ip': ip }, body });
+    const first = await post('1.1.1.1');
+    expect(first.status).toBe(201);
+    expect((await post('2.2.2.2')).status).toBe(429); // different IP, same global cap
+    const { token } = (await first.json()) as { token: string };
+    const search = async () => ((await (await limited.request(`/${token}/subtitles/movie/tt1.json`)).json()) as any).subtitles.length;
+    expect(await search()).toBe(2);
+    expect(await search()).toBe(0);
+  });
+
   it('requires the signup code and valid credentials', async () => {
     const wrongCode = await send('POST', '/api/configs', {
       signupCode: 'nope',

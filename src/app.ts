@@ -30,7 +30,8 @@ const RESOLVE_TTL_MS = 2 * 60 * 60 * 1000;
 
 export interface AppDeps {
   baseUrl: string;
-  signupCode: string;
+  /** When set, new configs need this code. When unset, signup is open. */
+  signupCode?: string;
   /** Plain-text notice for the configure page. */
   notice?: string;
   /** Optional header links on the configure page. */
@@ -39,6 +40,8 @@ export interface AppDeps {
   providers: Provider[];
   log?: (message: string, fields?: Record<string, unknown>) => void;
   now?: () => number;
+  /** Override abuse limits (tests). */
+  limits?: { signupsPerHour?: number; searchesPerMinute?: number };
 }
 
 const ProviderInputSchema = z.object({ credentials: z.record(z.string(), z.string().max(500)) });
@@ -46,7 +49,7 @@ const ConfigInputSchema = z.object({
   preferences: PreferencesSchema,
   providers: z.record(z.string(), ProviderInputSchema),
 });
-const CreateInputSchema = ConfigInputSchema.extend({ signupCode: z.string().max(200) });
+const CreateInputSchema = ConfigInputSchema.extend({ signupCode: z.string().max(200).optional() });
 
 class HttpError extends Error {
   constructor(
@@ -63,6 +66,12 @@ export function createApp(deps: AppDeps) {
   const now = deps.now ?? Date.now;
   const providers = new Map(deps.providers.map((p) => [p.id, p]));
   const writeLimiter = new RateLimiter(10, 10 * 60 * 1000, now);
+  // Caps across all clients. With open signup, every new config tests a username and password
+  // against OpenSubtitles with this instance's API key; this stops that being used at scale
+  // (credential stuffing) and keeps the key from being throttled.
+  const signupLimiter = new RateLimiter(deps.limits?.signupsPerHour ?? 30, 60 * 60 * 1000, now);
+  // Normal playback makes one search per video; this only stops scripts hammering the key.
+  const searchLimiter = new RateLimiter(deps.limits?.searchesPerMinute ?? 120, 60 * 1000, now);
   // Remembers download links per user and file (they stay valid for hours), so reopening a
   // subtitle does not spend another download from the user's quota.
   const resolved = new TtlCache<ResolveResult>(5000);
@@ -131,6 +140,7 @@ export function createApp(deps: AppDeps) {
   app.get('/api/meta', (c) =>
     c.json({
       version: VERSION,
+      signupRequired: Boolean(deps.signupCode),
       notice: deps.notice?.trim() || null,
       links: { github: deps.links?.github ?? null, discord: deps.links?.discord ?? null },
       languages: LANGUAGES.map(({ code, name }) => ({ code, name })),
@@ -147,7 +157,13 @@ export function createApp(deps: AppDeps) {
     limit(c);
     const input = CreateInputSchema.safeParse(await c.req.json().catch(() => null));
     if (!input.success) throw new HttpError(400, firstIssue(input.error));
-    if (!safeEqual(input.data.signupCode, deps.signupCode)) throw new HttpError(403, 'Wrong signup code');
+    if (deps.signupCode && !safeEqual(input.data.signupCode ?? '', deps.signupCode)) {
+      throw new HttpError(403, 'Wrong signup code');
+    }
+    if (!signupLimiter.take('all')) {
+      log('signup limit reached');
+      throw new HttpError(429, 'Too many new configs right now, try again later');
+    }
 
     const config: UserConfig = {
       preferences: input.data.preferences,
@@ -200,6 +216,10 @@ export function createApp(deps: AppDeps) {
     const prefix = `/${c.req.param('token')}/subtitles/`;
     const query = parseSubtitleRequest(c.req.path.slice(prefix.length));
     if (!query) return c.json({ subtitles: [] });
+    if (!searchLimiter.take(tokenId(token))) {
+      log('search limit reached');
+      return c.json({ subtitles: [] });
+    }
 
     const languages = config.preferences.languages.map((code) => languageByCode(code)!);
     const results = await Promise.all(
