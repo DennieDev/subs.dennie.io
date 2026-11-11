@@ -87,3 +87,7 @@ The configure page builds its form from `credentialFields` automatically.
 Note: SubDL and SubSource deliver subtitles as ZIP archives. Players cannot open those, so such a
 provider would have to download and unpack the file on this server and serve the text itself,
 unlike OpenSubtitles' redirect. Decide on that deliberately before adding one.
+
+## License
+
+[MIT](LICENSE)
