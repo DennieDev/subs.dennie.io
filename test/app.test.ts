@@ -88,7 +88,11 @@ describe('app', () => {
   it('serves a configured manifest and ranked subtitles that point back at the addon', async () => {
     const token = await create();
     const manifest = await (await send('GET', `/${token}/manifest.json`)).json();
-    expect(manifest).toMatchObject({ resources: ['subtitles'], behaviorHints: { configurationRequired: false } });
+    expect(manifest).toMatchObject({
+      resources: ['subtitles'],
+      logo: `${BASE}/logo.png`,
+      behaviorHints: { configurationRequired: false },
+    });
 
     const res = await send('GET', `/${token}/subtitles/movie/tt0111161/videoHash=abc.json`);
     expect(res.headers.get('access-control-allow-origin')).toBe('*');
@@ -168,6 +172,14 @@ describe('app', () => {
     expect(((await (await send('GET', '/api/meta')).json()) as any).notice).toBeNull();
     const withNotice = createApp({ baseUrl: BASE, signupCode: 'letmein123', store, providers: [provider], notice: '  Personal instance.  ' });
     expect(((await (await withNotice.request('/api/meta')).json()) as any).notice).toBe('Personal instance.');
+  });
+
+  it('serves the logo files', async () => {
+    const png = await send('GET', '/logo.png');
+    expect(png.status).toBe(200);
+    expect(png.headers.get('content-type')).toBe('image/png');
+    expect((await send('GET', '/logo.svg')).headers.get('content-type')).toBe('image/svg+xml');
+    expect((await send('GET', '/logo.gif')).status).toBe(404);
   });
 
   it('serves the configure page with a strict CSP', async () => {

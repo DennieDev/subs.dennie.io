@@ -20,6 +20,12 @@ const UI_FILES: Record<string, { file: string; type: string }> = {
   'configure.js': { file: 'configure.js', type: 'text/javascript; charset=utf-8' },
   'configure.css': { file: 'configure.css', type: 'text/css; charset=utf-8' },
 };
+const BRAND_FILES: Record<string, string> = {
+  'logo.svg': 'image/svg+xml',
+  'logo.png': 'image/png',
+  'logo-512.png': 'image/png',
+  'apple-touch-icon.png': 'image/png',
+};
 const RESOLVE_TTL_MS = 2 * 60 * 60 * 1000;
 
 export interface AppDeps {
@@ -106,6 +112,17 @@ export function createApp(deps: AppDeps) {
     c.header('Cache-Control', 'no-cache');
     return c.body(ui(entry.file));
   });
+
+  // Logo files: favicon, page header and the addon icon in Stremio.
+  app.get('/:file{(logo\\.svg|logo\\.png|logo-512\\.png|apple-touch-icon\\.png)}', (c) => {
+    const file = c.req.param('file');
+    const type = BRAND_FILES[file];
+    if (!type) return c.notFound();
+    c.header('Content-Type', type);
+    c.header('Cache-Control', 'public, max-age=86400');
+    return c.body(readFileSync(new URL(`brand/${file}`, UI_DIR)));
+  });
+  app.get('/favicon.ico', (c) => c.redirect('/logo.png', 301));
 
   // ---- Configuration API --------------------------------------------------------------
 
@@ -337,6 +354,7 @@ export function createApp(deps: AppDeps) {
       types: ['movie', 'series'],
       idPrefixes: ['tt'],
       catalogs: [],
+      logo: `${baseUrl}/logo.png`,
       behaviorHints: { configurable: true, configurationRequired },
     };
   }
