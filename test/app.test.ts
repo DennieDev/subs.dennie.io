@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createApp, redact } from '../src/app.js';
-import { ProviderAuthError, type Provider, type ResolveResult, type SubtitleCandidate } from '../src/providers/types.js';
+import { ProviderAuthError, ProviderError, type Provider, type ResolveResult, type SubtitleCandidate } from '../src/providers/types.js';
 import { ConfigStore } from '../src/store.js';
 
 const BASE = 'https://subs.example.test';
@@ -118,6 +118,19 @@ describe('app', () => {
     expect(await res.text()).toContain('Quota reached');
   });
 
+  it('turns provider errors on download into a notice, without caching them', async () => {
+    const token = await create();
+    provider.resolve = async () => {
+      provider.resolves += 1;
+      throw new ProviderError('OpenSubtitles is busy (rate limited). Try again in a minute.');
+    };
+    const res = await send('GET', `/${token}/dl/fake/5.srt`);
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain('rate limited');
+    await send('GET', `/${token}/dl/fake/5.srt`);
+    expect(provider.resolves).toBe(2);
+  });
+
   it('never returns passwords and keeps them when left blank on update', async () => {
     const token = await create();
     const read = (await (await send('GET', `/api/configs/${token}`)).json()) as any;
@@ -148,5 +161,9 @@ describe('app', () => {
 
   it('redacts tokens from logged paths', () => {
     expect(redact('/abcdefghijklmnopqrstuvwxyzABCDEF/dl/fake/1.srt')).toBe('/***/dl/fake/1.srt');
+    expect(redact('/abcdefghijklmnopqrstuvwxyzABCDEF/subtitles/series/tt1%3A1%3A1/filename=Show.S01E01.mkv&videoSize=1.json')).toBe(
+      '/***/subtitles/series/tt1%3A1%3A1/<extras>.json',
+    );
+    expect(redact('/abcdefghijklmnopqrstuvwxyzABCDEF/subtitles/movie/tt1.json')).toBe('/***/subtitles/movie/tt1.json');
   });
 });

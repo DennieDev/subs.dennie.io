@@ -109,7 +109,7 @@ export class OpenSubtitlesProvider implements Provider {
         .map((k) => `${k}=${encodeURIComponent(pageParams[k]!)}`)
         .join('&');
       const res = await this.request(`${DEFAULT_API}/subtitles?${qs}`, { method: 'GET' });
-      if (!res.ok) throw new ProviderError(`OpenSubtitles search failed (HTTP ${res.status})`);
+      if (!res.ok) throw failure(res, 'search');
       const body = (await res.json()) as SearchPage;
       for (const item of body.data ?? []) {
         const candidate = toCandidate(item);
@@ -146,7 +146,8 @@ export class OpenSubtitlesProvider implements Provider {
         message: `OpenSubtitles daily download limit reached.${body.reset_time ? ` Resets in ${body.reset_time}.` : ''}`,
       };
     }
-    if (!res.ok || !body.link) throw new ProviderError(`OpenSubtitles download failed (HTTP ${res.status})`);
+    if (!res.ok) throw failure(res, 'download');
+    if (!body.link) throw new ProviderError('OpenSubtitles returned no download link');
 
     const link = new URL(body.link);
     if (link.protocol !== 'https:' || !isOpenSubtitlesHost(link.hostname)) {
@@ -183,8 +184,7 @@ export class OpenSubtitlesProvider implements Provider {
     if (res.status === 401 || res.status === 400) {
       throw new ProviderAuthError('OpenSubtitles rejected the username or password');
     }
-    if (res.status === 429) throw new ProviderError('OpenSubtitles is rate limiting sign-ins; try again in a minute');
-    if (!res.ok) throw new ProviderError(`OpenSubtitles sign-in failed (HTTP ${res.status})`);
+    if (!res.ok) throw failure(res, 'sign-in');
 
     const body = (await res.json()) as { token?: string; base_url?: string };
     if (!body.token) throw new ProviderError('OpenSubtitles sign-in returned no token');
@@ -214,6 +214,16 @@ export class OpenSubtitlesProvider implements Provider {
       throw new ProviderError(`OpenSubtitles ${reason}`);
     }
   }
+}
+
+/**
+ * 429: too many requests (per IP or API key), temporary.
+ * 403: OpenSubtitles refused the API key itself; only the instance owner can fix that.
+ */
+function failure(res: Response, action: 'search' | 'download' | 'sign-in'): ProviderError {
+  if (res.status === 429) return new ProviderError('OpenSubtitles is busy (rate limited). Try again in a minute.');
+  if (res.status === 403) return new ProviderError('OpenSubtitles refused this addon\'s API key. Ask the addon owner to check it.');
+  return new ProviderError(`OpenSubtitles ${action} failed (HTTP ${res.status})`);
 }
 
 function isOpenSubtitlesHost(hostname: string): boolean {

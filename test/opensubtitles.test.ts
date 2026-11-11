@@ -108,6 +108,22 @@ describe('OpenSubtitlesProvider', () => {
     });
   });
 
+  it('explains rate limits and refused API keys', async () => {
+    const session = { token: 't', apiBase: 'https://api.opensubtitles.com/api/v1', expiresAt: Date.now() + 1e6 };
+    for (const [status, message] of [
+      [429, 'OpenSubtitles is busy (rate limited). Try again in a minute.'],
+      [403, "OpenSubtitles refused this addon's API key. Ask the addon owner to check it."],
+      [500, 'OpenSubtitles download failed (HTTP 500)'],
+    ] as const) {
+      const { fn } = fakeFetch(() => json(status, {}));
+      const p = new OpenSubtitlesProvider({ apiKey: 'k', userAgent: 'UA', fetch: fn });
+      await expect(p.resolve(ctx({ session }), '7')).rejects.toThrow(message);
+    }
+    const { fn } = fakeFetch(() => json(429, {}));
+    const p = new OpenSubtitlesProvider({ apiKey: 'k', userAgent: 'UA', fetch: fn });
+    await expect(p.verify({ username: 'u', password: 'p' })).rejects.toThrow('rate limited');
+  });
+
   it('refuses download links on foreign hosts and unknown login hosts', async () => {
     const { fn, calls } = fakeFetch((url) => {
       if (url.endsWith('/login')) return json(200, { token: 't', base_url: 'evil.example.com' });

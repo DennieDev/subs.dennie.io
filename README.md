@@ -31,7 +31,8 @@ SubDL, SubSource and others can be added later.
   the stored one.
 - New configs require `SIGNUP_CODE`, so the shared OpenSubtitles API key is not open to everyone.
   Config writes are rate limited per IP (10 per 10 minutes).
-- Logs contain only fixed messages and paths with the token replaced by `***`.
+- Logs contain only fixed messages and paths with the token replaced by `***`. Subtitle request
+  details (filename, video hash and size) are left out, so logs are not a viewing history.
 
 ## Configuration
 

@@ -343,7 +343,12 @@ function firstIssue(error: z.ZodError): string {
   return issue ? `${issue.path.join('.') || 'input'}: ${issue.message}` : 'Invalid input';
 }
 
-/** Replaces token-shaped path segments so they never reach logs. */
+/**
+ * Makes a path safe to log: token-shaped segments become `***`, and subtitle request extras
+ * (filename, video hash and size) are dropped so logs do not become a viewing history.
+ */
 export function redact(path: string): string {
-  return path.replace(/\/[A-Za-z0-9_-]{32}(?=\/|$)/g, '/***');
+  return path
+    .replace(/\/[A-Za-z0-9_-]{32}(?=\/|$)/g, '/***')
+    .replace(/(\/subtitles\/[^/]+\/[^/]+)\/[^/]+\.json$/, '$1/<extras>.json');
 }
