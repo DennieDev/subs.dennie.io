@@ -7,6 +7,8 @@
 
   const meta = await (await fetch('/api/meta')).json();
   $('version').textContent = `v${meta.version}`;
+  // Small header label: the site's own domain (example.com on sub.example.com).
+  $('brandDomain').textContent = location.hostname.split('.').slice(-2).join('.');
   if (!meta.signupRequired) $('signup-section').hidden = true;
   for (const [key, id] of [['github', 'linkGithub'], ['discord', 'linkDiscord']]) {
     const url = meta.links?.[key];

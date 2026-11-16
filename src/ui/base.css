@@ -1,0 +1,131 @@
+/* Shared base styles: design tokens, base elements, header, form controls, cards and footer.
+   Page-specific layout lives in configure.css, loaded after this file. */
+
+@font-face { font-family: Inter; font-weight: 400; font-style: normal; font-display: swap; src: url(fonts/Inter-Regular.woff2) format("woff2"); }
+@font-face { font-family: Inter; font-weight: 600; font-style: normal; font-display: swap; src: url(fonts/Inter-SemiBold.woff2) format("woff2"); }
+@font-face { font-family: Inter; font-weight: 700; font-style: normal; font-display: swap; src: url(fonts/Inter-Bold.woff2) format("woff2"); }
+
+:root {
+  /* Surfaces */
+  --bg: #070707;
+  --card: #0b0b0b;
+  --card-hover: #101010;
+  --field: #101010;
+  --field-hover: #161616;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --text: #f2f2f2;
+  --muted: rgba(255, 255, 255, 0.62);
+  --faint: rgba(255, 255, 255, 0.38);
+
+  /* Accent (the logo dot carries the product colour, not the accent) */
+  --brand: #6152df;
+  --brand-hover: #5243cb;
+  --brand-light: #9f92ff;
+  --brand-glow: rgba(97, 82, 223, 0.12);
+
+  /* States */
+  --ok: #2fbf84;
+  --warn: #f7be38;
+  --danger: #ea5e56;
+  --danger-text: #f2777a;
+
+  /* Type */
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Shape and motion */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Page widths: narrow (forms, status), wide (tools) */
+  --page: 760px;
+  --page-wide: 1280px;
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- base -- */
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(800px 400px at 50% -120px, var(--brand-glow), transparent 70%), var(--bg);
+  color: var(--text);
+  font: 15px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--brand-light); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--brand-light); outline-offset: 2px;
+}
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.01em; }
+small, .muted { color: var(--muted); }
+.faint { color: var(--faint); }
+.mono { font-family: var(--mono); }
+code { font: 0.9em var(--mono); background: var(--field); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+
+.page { max-width: var(--page); margin: 0 auto; padding: 32px 16px 56px; }
+.page.wide { max-width: var(--page-wide); }
+
+/* --------------------------------------------------------------- header -- */
+/* <header class="topbar"><a class="brand" href="/"><img src="/logo.svg" width="40" height="40" alt="">
+     <span class="brand-text"><span class="brand-domain">label</span><span class="brand-title">Name</span></span></a>
+     <span class="topbar-meta">optional</span></header> */
+
+.topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+.brand img { display: block; width: 40px; height: 40px; border-radius: 10px; flex: 0 0 auto; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-domain { font: 500 0.75rem var(--mono); letter-spacing: 3px; color: var(--faint); transition: color 0.3s; }
+.brand-title { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+a.brand:hover .brand-domain { color: var(--muted); }
+.topbar-meta { font: 0.78rem var(--mono); color: var(--faint); }
+.lede { color: var(--muted); margin: 16px 0 0; max-width: 60ch; }
+
+/* ----------------------------------------------------------- components -- */
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card + .card { margin-top: 16px; }
+
+label { display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+label.inline { display: flex; align-items: center; gap: 8px; }
+input, select, textarea, button {
+  font: inherit; color: var(--text); background: var(--field);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 9px 12px; min-width: 0;
+}
+input::placeholder, textarea::placeholder { color: var(--faint); }
+input:hover, select:hover, textarea:hover { background: var(--field-hover); }
+input[type=checkbox], input[type=radio] { width: 16px; height: 16px; padding: 0; accent-color: var(--brand); }
+input[type=color] { padding: 3px; height: 40px; width: 100%; cursor: pointer; }
+select option { background: #111; }
+
+button { cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+button:hover { border-color: var(--brand-light); }
+button:disabled { opacity: 0.5; cursor: default; }
+button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+button.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+button.link { background: none; border: 0; padding: 0; color: var(--brand-light); text-decoration: underline; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-pill); font: 500 0.75rem var(--mono); border: 1px solid var(--border); color: var(--muted); }
+.notice { border: 1px solid var(--border); border-left: 3px solid var(--brand); border-radius: var(--radius-sm); background: var(--card); padding: 12px 14px; color: var(--muted); }
+.notice.error { border-left-color: var(--danger); color: var(--danger-text); }
+.notice.ok { border-left-color: var(--ok); }
+
+/* --------------------------------------------------------------- footer -- */
+
+.footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-top: 32px; font: 0.75rem/1.6 var(--mono); color: var(--faint); }
+.footer a { color: inherit; text-decoration: none; letter-spacing: 2px; }
+.footer a:hover { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

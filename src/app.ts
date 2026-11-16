@@ -19,7 +19,9 @@ const UI_DIR = new URL('./ui/', import.meta.url);
 const UI_FILES: Record<string, { file: string; type: string }> = {
   'configure.js': { file: 'configure.js', type: 'text/javascript; charset=utf-8' },
   'configure.css': { file: 'configure.css', type: 'text/css; charset=utf-8' },
+  'base.css': { file: 'base.css', type: 'text/css; charset=utf-8' },
 };
+const FONT_FILES = new Set(['Inter-Regular.woff2', 'Inter-SemiBold.woff2', 'Inter-Bold.woff2']);
 const BRAND_FILES: Record<string, string> = {
   'logo.svg': 'image/svg+xml',
   'logo.png': 'image/png',
@@ -108,7 +110,7 @@ export function createApp(deps: AppDeps) {
   const page = (c: Context) => {
     c.header(
       'Content-Security-Policy',
-      "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     );
     c.header('Cache-Control', 'no-store');
     return c.html(ui('configure.html'));
@@ -122,6 +124,14 @@ export function createApp(deps: AppDeps) {
     c.header('Content-Type', entry.type);
     c.header('Cache-Control', 'no-cache');
     return c.body(ui(entry.file));
+  });
+
+  app.get('/ui/fonts/:file', (c) => {
+    const file = c.req.param('file');
+    if (!FONT_FILES.has(file)) return c.notFound();
+    c.header('Content-Type', 'font/woff2');
+    c.header('Cache-Control', 'public, max-age=31536000, immutable');
+    return c.body(readFileSync(new URL(`fonts/${file}`, UI_DIR)));
   });
 
   // Logo files: favicon, page header and the addon icon in Stremio.

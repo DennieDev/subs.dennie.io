@@ -1,62 +1,21 @@
-/* Dark theme in the style of AIOStreams: near-black ground, gray-950 cards with thin
-   translucent borders, purple brand accent. Secondary text is a little brighter than
-   AIOStreams' for contrast. */
-:root {
-  --bg: #070707;
-  --card: #0b0b0b;
-  --field: #101010;
-  --field-hover: #1c1c1c;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.18);
-  --text: #f2f2f2;
-  --muted: rgba(255, 255, 255, 0.62);
-  --brand: #6152df;
-  --brand-hover: #5243cb;
-  --brand-light: #9f92ff;
-  --danger: #f2777a;
-  --radius: 0.5rem;
-  --radius-lg: 0.85rem;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
-/* Component display rules must never beat the hidden attribute. */
-[hidden] { display: none !important; }
-html { background: var(--bg); }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font: 15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-main { max-width: 680px; margin: 0 auto; padding: 32px 16px 72px; }
+/* Configure page layout on top of base.css (tokens, base elements, header, cards, footer).
+   On this page the plain button is the primary action; .secondary is the neutral one. */
+main { max-width: 680px; margin: 0 auto; padding: 32px 16px 56px; }
 
-/* Header */
-.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.brand img { border-radius: 10px; flex: 0 0 auto; }
-h1 { margin: 0; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
-.version { margin: 0; color: var(--muted); font-size: 0.85rem; }
+/* Header links */
 .links { display: flex; gap: 6px; }
 .icon-link {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 999px;
+  width: 40px; height: 40px; border-radius: var(--radius-pill);
   color: var(--muted); border: 1px solid var(--border); background: var(--card);
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .icon-link:hover { color: var(--text); border-color: var(--border-strong); background: var(--field-hover); }
-.icon-link[hidden] { display: none; }
-.lead { color: var(--muted); margin: 16px 0 0; }
+h1.brand-title { margin: 0; }
 
 /* Cards */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 22px;
-  margin-top: 18px;
-}
-.card[hidden] { display: none; }
+.card { padding: 22px; margin-top: 18px; }
+.card + .card { margin-top: 18px; }
 h2 { margin: 0 0 14px; font-size: 1.05rem; font-weight: 600; }
 .hint { color: var(--muted); font-size: 0.88rem; margin: 6px 0 0; }
 label { display: block; font-weight: 500; font-size: 0.92rem; margin: 16px 0 6px; }
@@ -66,7 +25,7 @@ label.check { display: flex; gap: 10px; align-items: center; font-weight: 400; }
 /* Fields and buttons */
 input, select, button, .button {
   font: inherit;
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   padding: 9px 12px;
   background: var(--field);
@@ -75,11 +34,6 @@ input, select, button, .button {
 }
 input:not([type="checkbox"]), select { width: 100%; }
 input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; accent-color: var(--brand); }
-input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible {
-  outline: 2px solid var(--brand-light);
-  outline-offset: 2px;
-}
-input::placeholder { color: rgba(255, 255, 255, 0.35); }
 button, .button {
   cursor: pointer;
   background: var(--brand);
@@ -96,12 +50,12 @@ button, .button {
 button:hover, .button:hover { background: var(--brand-hover); border-color: var(--brand-hover); color: #fff; }
 button.secondary { background: var(--field); color: var(--text); border-color: var(--border); }
 button.secondary:hover { background: var(--field-hover); border-color: var(--border-strong); }
-button.danger { background: transparent; color: var(--danger); border-color: rgba(242, 119, 122, 0.5); }
+button.danger { background: transparent; color: var(--danger-text); border-color: rgba(242, 119, 122, 0.5); }
 button.danger:hover { background: rgba(242, 119, 122, 0.1); }
 button:disabled { opacity: 0.55; cursor: wait; }
 .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
 .actions { margin-top: 20px; justify-content: space-between; }
-.error { color: var(--danger); font-weight: 600; margin: 16px 0 0; }
+.error { color: var(--danger-text); font-weight: 600; margin: 16px 0 0; }
 .error[hidden] { display: none; }
 a { color: var(--brand-light); }
 a:hover { color: #c7c2ff; }
@@ -128,7 +82,7 @@ a:hover { color: #c7c2ff; }
   margin-top: 18px;
   padding: 14px 16px;
   border: 1px solid rgba(159, 146, 255, 0.3);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: rgba(97, 82, 223, 0.1);
   color: var(--muted);
   font-size: 0.92rem;
@@ -145,6 +99,5 @@ a:hover { color: #c7c2ff; }
 .notice-close:hover { background: transparent; border: none; color: var(--text); }
 
 @media (max-width: 480px) {
-  h1 { font-size: 1.35rem; }
   .actions { flex-direction: column-reverse; align-items: stretch; }
 }

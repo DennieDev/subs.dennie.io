@@ -226,6 +226,15 @@ describe('app', () => {
     const res = await send('GET', '/configure');
     expect(res.status).toBe(200);
     expect(res.headers.get('content-security-policy')).toContain("script-src 'self'");
+    expect(res.headers.get('content-security-policy')).toContain("font-src 'self'");
+  });
+
+  it('serves only the bundled fonts and base stylesheet', async () => {
+    const font = await send('GET', '/ui/fonts/Inter-Regular.woff2');
+    expect(font.status).toBe(200);
+    expect(font.headers.get('content-type')).toBe('font/woff2');
+    expect((await send('GET', '/ui/fonts/other.woff2')).status).toBe(404);
+    expect((await send('GET', '/ui/base.css')).headers.get('content-type')).toBe('text/css; charset=utf-8');
   });
 
   it('redacts tokens from logged paths', () => {
