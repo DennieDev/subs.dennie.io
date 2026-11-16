@@ -121,8 +121,12 @@ button.link { background: none; border: 0; padding: 0; color: var(--brand-light)
 .notice.ok { border-left-color: var(--ok); }
 
 /* --------------------------------------------------------------- footer -- */
+/* <footer class="footer"><span>One line of context.</span><a href="https://example.com">example.com</a></footer>
+   The last item (the domain link) stays at the right, also when the text wraps. */
 
-.footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-top: 32px; font: 0.75rem/1.6 var(--mono); color: var(--faint); }
+.footer { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 24px; margin-top: 32px; font: 0.75rem/1.6 var(--mono); color: var(--faint); }
+.footer > :first-child { flex: 1 1 auto; min-width: 0; }
+.footer > :last-child:not(:first-child) { flex: 0 0 auto; }
 .footer a { color: inherit; text-decoration: none; letter-spacing: 2px; }
 .footer a:hover { color: var(--muted); }
 

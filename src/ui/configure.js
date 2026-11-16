@@ -6,9 +6,16 @@
   let token = match ? match[1] : null;
 
   const meta = await (await fetch('/api/meta')).json();
-  $('version').textContent = `v${meta.version}`;
+  $('version').textContent = `· v${meta.version}`;
   // Small header label: the site's own domain (example.com on sub.example.com).
-  $('brandDomain').textContent = location.hostname.split('.').slice(-2).join('.');
+  const domain = location.hostname.split('.').slice(-2).join('.');
+  $('brandDomain').textContent = domain;
+  // Footer link to the site's root domain, as on the other pages of the same site.
+  if (domain.includes('.')) {
+    $('homeLink').href = `https://${domain}`;
+    $('homeLink').textContent = domain;
+    $('homeLink').hidden = false;
+  }
   if (!meta.signupRequired) $('signup-section').hidden = true;
   for (const [key, id] of [['github', 'linkGithub'], ['discord', 'linkDiscord']]) {
     const url = meta.links?.[key];
